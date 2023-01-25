@@ -1,0 +1,43 @@
+metadata:
+  namespace: myproject
+  displayName: MyProject
+  description: This is a Project
+
+backup:
+  enable: true
+  veleroNamespace: openshift-adp
+  spec:
+    schedule: '@daily'
+    ttl: 120h0m0s
+    snapshotVolumes: false
+
+egressNetworkPolicy:
+  enable: true
+  rules:
+  # API Connect:
+  - { type: cidr, value: 192.168.1.2/32 }
+  # DDBB Oracle:
+  - { type: dns,  value: myapp.example.logicalis }
+
+serviceAccount:
+  - example-sa
+
+roleBindings:
+  # Example SA
+  - objectKind: ServiceAccount
+    object: example-sa
+    roleKind: ClusterRole
+    role: admin
+
+  # Groups
+  - objectKind: Group
+    object: RBACDevs
+    roleKind: ClusterRole
+    role: devs-view
+    comment: View permissions for developers
+
+  - objectKind: Group
+    object: RBACDevs
+    roleKind: ClusterRole
+    role: devs-edit
+    comment: Edit permissions for developers

@@ -1,0 +1,166 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "required": [
+        "metadata",
+        "backup",
+        "egressNetworkPolicy",
+        "serviceAccount",
+        "roleBindings"
+    ],
+    "properties": {
+        "metadata": {
+            "description": "Namespace information.",
+            "type": "object",
+            "required": [ "namespace" ],
+            "properties": {
+                "namespace": {
+                    "description": "Namespace to create along its assocuiated resources.",
+                    "type": "string",
+                    "pattern": "^[a-z0-9-_]+$"
+                },
+                "displayName": {
+                    "description": "Openshift display name for Namespace.",
+                    "type": ["string", "null"]
+                },
+                "description": {
+                    "description": "Openshift description for Namespace.",
+                    "type": ["string", "null"]
+                }
+            }
+        },
+        "backup": {
+            "description": "Backup Information.",
+            "type": "object",
+            "required": [
+            "enable",
+            "veleroNamespace",
+            "spec"
+            ],
+            "properties": {
+                "enable": {
+                    "description": "A boolean. When true, it creates a backup schedule for the selected namespace.",
+                    "type": "boolean",
+                    "default": false
+                },
+                "veleroNamespace": {
+                    "description": "Namespace where the schedule will be located.",
+                    "type": [ "string", "null" ],
+                    "default": "openshift-adp"
+                },
+                "spec": {
+                    "description": "Schedule relevant specification.",
+                    "type": [ "object", "null" ],
+                    "properties": {
+                        "schedule": {
+                            "description": "Cron entry for Schedule.",
+                            "type": [ "string", "null" ],
+                            "default": "@daily"
+                        },
+                        "ttl": {
+                            "description": "Backup Time-to-live.",
+                            "type": [ "string", "null" ],
+                            "default": "120h0m0s"
+                        },
+                        "snapshotVolumes": {
+                            "description": "A boolean. When true, it creates a snapshoot of the PVCs in the namespace",
+                            "type": [ "boolean", "null" ],
+                            "default": false
+                        }
+                    }
+                }
+            }
+        },
+
+        "egressNetworkPolicy": {
+            "description": "EgressNetworkPolicy information",
+            "type": "object",
+            "required": [
+                "enable",
+                "rules"
+            ],
+            "properties": {
+                "enable": {
+                    "description": "A boolean. When true, it creates an EgressNetworkPolicy for the selected namespace that will deny all traffic by default except for the endpoints specified in here.",
+                    "type": "boolean",
+                    "default": true
+                },
+                "rules": {
+                    "description": "Allowed rules for EgressNetworkPolicy.",
+                    "type": [ "array", "null" ],
+                    "items": {
+                        "description": "An allow rule for the EgressNetworkPolicy.",
+                        "type": [ "object", "null" ],
+                        "required": [ "type", "value" ],
+                        "properties": {
+                            "type": {
+                                "description": "Type of Allow entry (by cidrAddress or dnsName).",
+                                "type": "string",
+                                "enum": [ 
+                                    "cidr",
+                                    "dns"
+                                ]
+                            },
+                            "value": {
+                                "description": "Endpoint to be allowed.",
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "serviceAccount": {
+            "description": "An array of Service Accounts to be created within this namespace. Each entry represents the name of the ServiceAccount.",
+            "type": [ "array", "null" ],
+            "items": {
+                "type": "string"
+            }
+        },
+        "roleBindings": {
+            "description": "An array of RoleBindings to be created within this namespace.",
+            "type": [ "array", "null" ],
+            "items": {
+                "description": "A RoleBinding associated to this namespace that contains the required specification.",
+                "type": "object",
+                "required": [
+                    "objectKind",
+                    "object",
+                    "roleKind",
+                    "role"
+                ],
+                "properties": {
+                    "objectKind": {
+                        "description": "The entity type that will get associated to the role.",
+                        "type": "string",
+                        "enum": [
+                            "ServiceAccount",
+                            "Group",
+                            "User"
+                        ]
+                    },
+                    "object": {
+                        "description": "The name of the entity to be associated to the role.",
+                        "type": "string"
+                    },
+                    "roleKind": {
+                        "description": "The role type that will get associated to the entity.",
+                        "type": "string",
+                        "enum": [
+                            "ClusterRole",
+                            "Role"
+                        ]
+                    },
+                    "role": {
+                        "description": "The name of the role to be associated to the entity.",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "The RoleBinding description.",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

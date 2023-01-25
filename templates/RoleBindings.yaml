@@ -1,0 +1,24 @@
+{{ range .Values.roleBindings -}}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: "{{ .object }}-{{ .role }}"
+  namespace: {{ $.Values.metadata.namespace }}
+  {{ if .description -}}
+  annotations:
+    openshift.io/description: {{ .description }}
+  {{ end -}}
+  labels:
+    helm.sh/chart: {{ $.Chart.Name }}-{{ $.Chart.Version | replace "+" "_" }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+subjects:
+  - kind: {{ .objectKind }}
+    name: {{ .object }}
+    namespace: {{ $.Values.metadata.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: {{ .roleKind }}
+  name: {{ .role }}
+{{ end }}

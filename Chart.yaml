@@ -1,0 +1,8 @@
+apiVersion: v2
+name: demo-project
+version: '1'
+description: This chart creates a Namespace alongside its associated RBAC, Networking & Backup objects.
+maintainers:
+  - name: Jose Javier Gascón Carrera
+    email: josejavier.gascon@es.logicalis.com
+    
