@@ -4,7 +4,7 @@ metadata:
   description: This is a Project
 
 backup:
-  enable: false
+  enable: true
   veleroNamespace: openshift-adp
   spec:
     schedule: '@daily'
